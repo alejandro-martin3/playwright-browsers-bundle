@@ -1,0 +1,45 @@
+name: Build ms-playwright bundle (Playwright 1.53.1)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout (empty repo is fine)
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Create minimal project
+        run: |
+          mkdir pw-bundle
+          cd pw-bundle
+          npm init -y
+
+      - name: Install Playwright (exact version)
+        working-directory: pw-bundle
+        run: |
+          npm i -D playwright@1.53.1
+          npx playwright --version
+
+      - name: Download browsers
+        working-directory: pw-bundle
+        run: |
+          npx playwright install
+
+      - name: Package ms-playwright cache
+        run: |
+          tar -czf ms-playwright-1.53.1-ubuntu20.04-x64.tar.gz -C ~/.cache ms-playwright
+          ls -lh ms-playwright-1.53.1-ubuntu20.04-x64.tar.gz
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ms-playwright-1.53.1-ubuntu20.04-x64
+          path: ms-playwright-1.53.1-ubuntu20.04-x64.tar.gz
