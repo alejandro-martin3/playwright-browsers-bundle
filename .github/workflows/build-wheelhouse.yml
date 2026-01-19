@@ -1,10 +1,11 @@
-name: Build offline wheelhouse (Linux)
+name: Build offline wheelhouse (Linux py39)
 
 on:
   workflow_dispatch:
   push:
     paths:
       - "python/requirements.txt"
+      - ".github/workflows/build-wheelhouse.yml"
 
 jobs:
   wheelhouse:
@@ -18,17 +19,17 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: Build wheelhouse from requirements.txt
+      - name: Build wheelhouse
         run: |
           python -m pip install --upgrade pip
-          rm -rf python/vendor/wheels
-          mkdir -p python/vendor/wheels
-          pip download --only-binary=:all: -r python/requirements.txt -d python/vendor/wheels
-          ls -la python/vendor/wheels
+          rm -rf wheelhouse
+          mkdir -p wheelhouse
+          pip download --only-binary=:all: -r python/requirements.txt -d wheelhouse
+          ls -la wheelhouse
 
       - name: Upload wheelhouse artifact
         uses: actions/upload-artifact@v4
         with:
           name: wheelhouse-linux-py39
-          path: python/vendor/wheels
+          path: wheelhouse
           if-no-files-found: error
